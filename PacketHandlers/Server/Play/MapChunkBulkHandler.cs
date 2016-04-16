@@ -12,9 +12,9 @@ using ProtocolModern.Packets.Client.Play;
 
 namespace ProtocolModern.PacketHandlers.Server.Play
 {
-    public class MapChunkBulkHandler : ProtocolPacketHandler<MapChunkBulkPacket, Packet>
+    public class MapChunkBulkHandler : ProtocolPacketHandler<MapChunkBulkPacket>
     {
-        public override Packet Handle(MapChunkBulkPacket packet)
+        public override ProtobufPacket Handle(MapChunkBulkPacket packet)
         {
             Context.ClientReceiveEvent(new ChunkArrayEvent(ChunkExtra.ReadChunkArray(packet.SkyLightSent, packet.MetaInformation,
                     new ZInputStream(new MemoryStream(packet.Data)).ReadFully())));

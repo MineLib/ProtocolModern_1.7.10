@@ -5,7 +5,6 @@ using Aragas.Core.Packets;
 
 using MineLib.Core.Data;
 using MineLib.Core.Data.Anvil;
-using MineLib.Core.Data.Structs;
 using MineLib.Core.Events;
 using MineLib.Core.Events.ReceiveEvents.Anvil;
 

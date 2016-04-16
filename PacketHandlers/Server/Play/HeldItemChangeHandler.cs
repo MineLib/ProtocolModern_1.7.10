@@ -6,9 +6,9 @@ using ProtocolModern.Packets.Client.Play;
 
 namespace ProtocolModern.PacketHandlers.Server.Play
 {
-    public class HeldItemChangeHandler : ProtocolPacketHandler<HeldItemChangePacket, Packet>
+    public class HeldItemChangeHandler : ProtocolPacketHandler<HeldItemChangePacket>
     {
-        public override Packet Handle(HeldItemChangePacket packet)
+        public override ProtobufPacket Handle(HeldItemChangePacket packet)
         {
             Context.ClientReceiveEvent(new HeldItemChangeEvent((byte) packet.Slot));
 

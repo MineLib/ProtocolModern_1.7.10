@@ -4,9 +4,9 @@ using ProtocolModern.Packets.Client.Status;
 
 namespace ProtocolModern.PacketHandlers.Server.Status
 {
-    public class ResponseHandler : ProtocolPacketHandler<ResponsePacket, Packet>
+    public class ResponseHandler : ProtocolPacketHandler<ResponsePacket>
     {
-        public override Packet Handle(ResponsePacket packet)
+        public override ProtobufPacket Handle(ResponsePacket packet)
         {
             return null;
         }

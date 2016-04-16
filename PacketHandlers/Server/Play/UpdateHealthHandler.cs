@@ -6,9 +6,9 @@ using ProtocolModern.Packets.Client.Play;
 
 namespace ProtocolModern.PacketHandlers.Server.Play
 {
-    public class UpdateHealthHandler : ProtocolPacketHandler<UpdateHealthPacket, Packet>
+    public class UpdateHealthHandler : ProtocolPacketHandler<UpdateHealthPacket>
     {
-        public override Packet Handle(UpdateHealthPacket packet)
+        public override ProtobufPacket Handle(UpdateHealthPacket packet)
         {
             Context.ClientReceiveEvent(new UpdateHealthEvent(packet.Health));
             Context.ClientReceiveEvent(new UpdateFoodEvent(packet.Food, packet.FoodSaturation));

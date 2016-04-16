@@ -7,9 +7,9 @@ using ProtocolModern.Packets.Client.Play;
 
 namespace ProtocolModern.PacketHandlers.Server.Play
 {
-    public class PlayerPositionAndLookHandler : ProtocolPacketHandler<PlayerPositionAndLookPacket, Packet>
+    public class PlayerPositionAndLookHandler : ProtocolPacketHandler<PlayerPositionAndLookPacket>
     {
-        public override Packet Handle(PlayerPositionAndLookPacket packet)
+        public override ProtobufPacket Handle(PlayerPositionAndLookPacket packet)
         {
             Context.ClientReceiveEvent(new PlayerPositionEvent(new Vector3(packet.X, packet.Y, packet.Z)));
             Context.ClientReceiveEvent(new PlayerLookEvent(new Vector3(packet.Yaw, packet.Pitch)));

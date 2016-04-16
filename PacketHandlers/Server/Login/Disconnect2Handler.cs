@@ -4,9 +4,9 @@ using ProtocolModern.Packets.Client.Login;
 
 namespace ProtocolModern.PacketHandlers.Server.Login
 {
-    public class Disconnect2Handler : ProtocolPacketHandler<Disconnect2Packet, Packet>
+    public class Disconnect2Handler : ProtocolPacketHandler<Disconnect2Packet>
     {
-        public override Packet Handle(Disconnect2Packet packet)
+        public override ProtobufPacket Handle(Disconnect2Packet packet)
         {
             Context.Disconnect();
 

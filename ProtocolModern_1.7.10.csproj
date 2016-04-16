@@ -36,10 +36,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Client\Protocol.ModAPI.cs" />
     <Compile Include="Data\ChunkColumnMetadata.cs" />
     <Compile Include="Data\ChunkExtra.cs" />
     <Compile Include="Data\ServerInfo.cs" />
-    <Compile Include="Data\DisplayedSkinParts.cs" />
     <Compile Include="Data\EntityMetadataList.cs" />
     <Compile Include="Data\EntityMetadata\EntityMetadataByte.cs" />
     <Compile Include="Data\EntityMetadata\EntityMetadataFloat.cs" />
@@ -50,7 +50,6 @@
     <Compile Include="Data\EntityMetadata\EntityMetadataString.cs" />
     <Compile Include="Data\EntityMetadata\EntityMetadataVector.cs" />
     <Compile Include="Data\EntityProperty.cs" />
-    <Compile Include="Data\Icons.cs" />
     <Compile Include="Data\PlayerData.cs" />
     <Compile Include="Data\StatisticsEntry.cs" />
     <Compile Include="Enum\ClientPacketEnums.cs" />
@@ -187,7 +186,6 @@
     <Compile Include="Enum\ClientStatus.cs" />
     <Compile Include="Enum\NextState.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Client\Protocol.Forge.cs" />
     <Compile Include="Client\Protocol.PluginChannel.cs" />
     <Compile Include="Client\Protocol.CustomReceiving.cs" />
     <Compile Include="Client\Protocol.HandlerSending.cs" />
@@ -226,5 +224,6 @@
       <Name>Aragas.Core</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
 </Project>

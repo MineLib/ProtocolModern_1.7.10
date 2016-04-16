@@ -4,7 +4,7 @@ using Aragas.Core.Data;
 using Aragas.Core.IO;
 using Aragas.Core.Packets;
 
-using MineLib.Core.Data.Structs;
+using MineLib.Core.Data;
 
 using ProtocolModern.Enum;
 

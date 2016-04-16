@@ -8,7 +8,6 @@ using fNbt;
 
 using MineLib.Core.Data;
 using MineLib.Core.Data.Anvil;
-using MineLib.Core.Data.Structs;
 using MineLib.Core.Exceptions;
 
 using Org.BouncyCastle.Math;
@@ -59,13 +58,13 @@ namespace ProtocolModern.Extensions
             var chunk = new Chunk(new Coordinates2D(reader.Read<int>(), reader.Read<int>()));
             //chunk.Coordinates = new Coordinates2D(reader.Read<int>(), reader.Read<int>());
             chunk.GroundUp = reader.Read<bool>();
-            chunk.PrimaryBitMap = reader.Read<ushort>();
+            var primaryBitMap = reader.Read<ushort>();
             chunk.OverWorld = true; // TODO: From World class
 
             var size = reader.Read<VarInt>();
             var data = reader.Read<byte[]>(null, size);
 
-            var sectionCount = Chunk.GetSectionCount(chunk.PrimaryBitMap);
+            var sectionCount = Chunk.GetSectionCount(primaryBitMap);
 
             var chunkRawBlocks      = new byte[sectionCount * Chunk.TwoByteData];
             var chunkRawBlocksLight = new byte[sectionCount * Chunk.HalfByteData];
@@ -77,7 +76,7 @@ namespace ProtocolModern.Extensions
 
             for (int y = 0, i = 0; y < 16; y++)
             {
-                if ((chunk.PrimaryBitMap & (1 << y)) > 0)
+                if ((primaryBitMap & (1 << y)) > 0)
                 {
                     // Blocks & Metadata
                     var rawBlocks = new byte[Chunk.TwoByteData];
@@ -125,9 +124,9 @@ namespace ProtocolModern.Extensions
             {
                 var chunk = new Chunk(meta.Coordinates);
                 chunk.OverWorld = true;
-                chunk.PrimaryBitMap = meta.PrimaryBitMap;
+                var primaryBitMap = meta.PrimaryBitMap;
 
-                var sectionCount = Chunk.GetSectionCount(chunk.PrimaryBitMap);
+                var sectionCount = Chunk.GetSectionCount(primaryBitMap);
 
                 var chunkRawBlocks = new byte[sectionCount * Chunk.TwoByteData];
                 var chunkRawBlocksLight = new byte[sectionCount * Chunk.HalfByteData];
@@ -145,7 +144,7 @@ namespace ProtocolModern.Extensions
 
                 for (int y = 0, i = 0; y < 16; y++)
                 {
-                    if ((chunk.PrimaryBitMap & (1 << y)) > 0)
+                    if ((primaryBitMap & (1 << y)) > 0)
                     {
                         // Blocks & Metadata
                         var rawBlocks = new byte[Chunk.TwoByteData];
@@ -402,20 +401,16 @@ namespace ProtocolModern.Extensions
                 length = reader.Read<int>();
 
             var array = new BlockPosition[length];
-            for (int i = 0; i < length; i++)
+            for (var i = 0; i < length; i++)
             {
-                var record = new BlockPosition();
-
                 var coordinates = reader.Read<short>();
                 var y = coordinates & 0xFF;
                 var z = (coordinates >> 8) & 0xf;
                 var x = (coordinates >> 12) & 0xf;
 
                 var blockIDMeta = reader.Read<VarInt>();
-                record.Block = new Block((ushort)(blockIDMeta >> 4), (byte)(blockIDMeta & 0xF));
-                record.Coordinates = new Position(x, y, z);
 
-                array[i] = record;
+                array[i] = new BlockPosition((ushort) blockIDMeta, new Position(x, y, z));
             }
 
             return array;

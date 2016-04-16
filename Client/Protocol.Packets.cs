@@ -1,8 +1,7 @@
-﻿using Aragas.Core.Extensions;
-using Aragas.Core.PacketHandlers;
+﻿using Aragas.Core.PacketHandlers;
 using Aragas.Core.Packets;
 
-using MineLib.Core;
+using MineLib.Core.Client;
 
 using ProtocolModern.PacketHandlers;
 
@@ -10,7 +9,7 @@ namespace ProtocolModern.Client
 {
     public sealed partial class Protocol
     {
-        private void OnPacketHandled(int id, ProtobufPacket packet, ConnectionState state)
+        private void OnPacketHandled(int id, ProtobufPacket packet, ClientState state)
         {
             if(!Connected)
                 return;
@@ -19,16 +18,16 @@ namespace ProtocolModern.Client
 
             switch (state)
             {
-                case ConnectionState.Joining:
-                    handler = ServerPacketHandlers.LoginPacketResponses.Handlers[id];
+                case ClientState.Joining:
+                    handler = ServerPacketHandlers.LoginPacketResponses.Handlers[id]?.Invoke(this);
                     break;
 
-                case ConnectionState.Joined:
-                    handler = ServerPacketHandlers.PlayPacketResponses.Handlers[id];
+                case ClientState.Joined:
+                    handler = ServerPacketHandlers.PlayPacketResponses.Handlers[id]?.Invoke(this);
                     break;
 
-                case ConnectionState.InfoRequest:
-                    handler = ServerPacketHandlers.StatusPacketResponses.Handlers[id];
+                case ClientState.InfoRequest:
+                    handler = ServerPacketHandlers.StatusPacketResponses.Handlers[id]?.Invoke(this);
                     break;
             }
 
@@ -41,6 +40,9 @@ namespace ProtocolModern.Client
             }
 
             DoCustomReceiving(packet);
+
+            foreach (var modAPI in ModAPIs)
+                modAPI.OnPacket(packet);
         }
     }
 }

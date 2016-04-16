@@ -7,9 +7,9 @@ using ProtocolModern.Packets.Client.Play;
 
 namespace ProtocolModern.PacketHandlers.Server.Play
 {
-    public class SpawnPositionHandler : ProtocolPacketHandler<SpawnPositionPacket, Packet>
+    public class SpawnPositionHandler : ProtocolPacketHandler<SpawnPositionPacket>
     {
-        public override Packet Handle(SpawnPositionPacket packet)
+        public override ProtobufPacket Handle(SpawnPositionPacket packet)
         {
             Context.ClientReceiveEvent(new SpawnPointEvent(new Position(packet.X, packet.Y, packet.Z)));
 

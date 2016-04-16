@@ -6,9 +6,8 @@ using Aragas.Core.Data;
 using Aragas.Core.Packets;
 using Aragas.Core.Wrappers;
 
-using MineLib.Core;
+using MineLib.Core.Client;
 using MineLib.Core.Events;
-using MineLib.Core.Interfaces;
 
 using Newtonsoft.Json;
 
@@ -18,7 +17,6 @@ using ProtocolModern.IO;
 using ProtocolModern.Packets.Client.Status;
 using ProtocolModern.Packets.Server.Handshake;
 using ProtocolModern.Packets.Server.Status;
-using Protocol = ProtocolModern.Client.Protocol;
 
 namespace ProtocolModern
 {
@@ -45,13 +43,13 @@ namespace ProtocolModern
         private event Action<ProtobufPacket> OnResponsePacket;
 
 
-        public IServerInfo GetServerInfo(string ip, ushort port, int protocolVersion)
+        public ServerInfo GetServerInfo(string ip, ushort port, int protocolVersion)
         {
             var responseData = new ServerResponse();
             var response = false;
 
-            var protocol = new Protocol(null, ProtocolMode.Status);
-            protocol.Connect(ip, port);
+            var protocol = new Client.Protocol(null, ProtocolPurpose.InfoRequest);
+            protocol.Connect(new ServerInfo { Address = new ServerAddress { IP = ip, Port = port } });
 
             protocol.RegisterCustomReceiving<ResponsePacket>(ReceiveResponse);
             OnResponsePacket += packet => { responseData.Info = ParseResponse((ResponsePacket) packet); response = true; };
@@ -59,8 +57,8 @@ namespace ProtocolModern
             protocol.RegisterSending<HandshakeEvent>(SendHandshake);
             protocol.RegisterSending<SendRequestEvent>(SendSendRequest);
 
-            protocol.DoSending(new HandshakeEvent(ip, port, protocolVersion));
-            protocol.DoSending(new SendRequestEvent());
+            protocol.FireEvent(new HandshakeEvent(ip, port, protocolVersion));
+            protocol.FireEvent(new SendRequestEvent());
             
             var watch = Stopwatch.StartNew();
             while (!response) { Task.Delay(100).Wait(); if(watch.ElapsedMilliseconds > 2000) { responseData.Ping = long.MaxValue;  break;} }

@@ -6,9 +6,9 @@ using ProtocolModern.Packets.Client.Play;
 
 namespace ProtocolModern.PacketHandlers.Server.Play
 {
-    public class ChatMessageHandler : ProtocolPacketHandler<ChatMessagePacket, Packet>
+    public class ChatMessageHandler : ProtocolPacketHandler<ChatMessagePacket>
     {
-        public override Packet Handle(ChatMessagePacket packet)
+        public override ProtobufPacket Handle(ChatMessagePacket packet)
         {
             Context.ClientReceiveEvent(new ChatMessageEvent(packet.JSONData));
 

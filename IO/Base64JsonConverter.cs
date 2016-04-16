@@ -1,9 +1,10 @@
 using System;
+
 using Newtonsoft.Json;
 
 namespace ProtocolModern.IO
 {
-    public sealed class Base64JsonConverter : JsonConverter
+    internal sealed class Base64JsonConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType)
         {

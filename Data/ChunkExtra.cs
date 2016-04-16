@@ -53,7 +53,7 @@ namespace ProtocolModern.Data
                     if (lightIncluded)
                         Array.Copy(data, ((Chunk.OneByteData + Chunk.HalfByteData + Chunk.HalfByteData) * sectionCount) + (y * Chunk.HalfByteData),
                             rawSkylight, 0, Chunk.HalfByteData);
-                    
+
                     chunk.Sections[y].BuildFromNibbleData(CombineBlockMetadata(rawBlocks, Section.ToBytePerBlock(rawBlocksMetadata)), rawBlocksLight, rawSkylight);
                 }
             }

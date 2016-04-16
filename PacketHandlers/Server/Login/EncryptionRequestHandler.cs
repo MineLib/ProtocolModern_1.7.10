@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 
 using Aragas.Core;
+using Aragas.Core.Packets;
 
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Security;
@@ -12,32 +13,38 @@ using ProtocolModern.Packets.Server.Login;
 
 namespace ProtocolModern.PacketHandlers.Server.Login
 {
-    public class EncryptionRequestHandler : ProtocolPacketHandler<EncryptionRequestPacket, EncryptionResponsePacket>
+    public class EncryptionRequestHandler : ProtocolPacketHandler<EncryptionRequestPacket>
     {
-        public override EncryptionResponsePacket Handle(EncryptionRequestPacket packet)
+        public override ProtobufPacket Handle(EncryptionRequestPacket packet)
         {
-            Context.ModernEnableEncryption(packet.ServerID, packet.PublicKey, packet.VerifyToken);
-
-            return null;
-            /*
             var generator = new CipherKeyGenerator();
             generator.Init(new KeyGenerationParameters(new SecureRandom(), 16 * 8));
             var sharedKey = generator.GenerateKey();
-            Context.InitializeEncryption(sharedKey);
 
             var hash = GetServerIDHash(packet.PublicKey, sharedKey, packet.ServerID);
             if (!Yggdrasil.JoinSession(Context.AccessToken, Context.SelectedProfile, hash).Result.Response)
                 throw new Exception("Yggdrasil error: Not authenticated.");
 
             var signer = new PKCS1Signer(packet.PublicKey);
-            return new EncryptionResponsePacket
+            Context.SendPacket(new EncryptionResponsePacket
             {
                 SharedSecret = signer.SignData(sharedKey),
                 VerifyToken = signer.SignData(packet.VerifyToken)
-            };
-            */
+            });
+
+            Context.Stream.InitializeEncryption(sharedKey);
+
+            return null;
         }
 
+        private static string GetServerIDHash(byte[] publicKey, byte[] secretKey, string serverID)
+        {
+            var hashlist = new List<byte>();
+            hashlist.AddRange(Encoding.UTF8.GetBytes(serverID));
+            hashlist.AddRange(secretKey);
+            hashlist.AddRange(publicKey);
 
+            return JavaHelper.JavaHexDigest(hashlist.ToArray());
+        }
     }
 }

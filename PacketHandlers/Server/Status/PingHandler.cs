@@ -4,9 +4,9 @@ using ProtocolModern.Packets.Client.Status;
 
 namespace ProtocolModern.PacketHandlers.Server.Status
 {
-    public class PingHandler : ProtocolPacketHandler<PingPacket, Packet>
+    public class PingHandler : ProtocolPacketHandler<PingPacket>
     {
-        public override Packet Handle(PingPacket packet)
+        public override ProtobufPacket Handle(PingPacket packet)
         {
             return null;
         }

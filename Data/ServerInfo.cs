@@ -1,23 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-using MineLib.Core.Interfaces;
+using MineLib.Core.Client;
 
 using Newtonsoft.Json;
 
 namespace ProtocolModern.Data
 {
-    public sealed class ServerInfo : IServerInfo
-    {
-        [JsonProperty("name")]
-        public string Name { get; set; }
-
-        [JsonProperty("address")]
-        public ServerAddress Address { get; set; }
-
-        [JsonIgnore]
-        public IServerResponse ServerResponse { get; set; }
-    }
     public struct ServerResponse : IServerResponse
     {
         public ServerData Info { get; internal set; }

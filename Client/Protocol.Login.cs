@@ -4,14 +4,20 @@ namespace ProtocolModern.Client
 {
     public sealed partial class Protocol
     {
-        private string AccessToken { get; set; }
-        private string ClientToken { get; set; }
-        private string SelectedProfile { get; set; }
+        private string YggLogin { get; set; }
+        private string YggPassword { get; set; } // -- Say thanks to Mojang https://bugs.mojang.com/browse/WEB-327
+
+        internal string AccessToken { get; private set; }
+        internal string ClientToken { get; private set; }
+        internal string SelectedProfile { get; private set; }
 
 
         public override async Task<bool> Login(string login, string password)
         {
-            var result = await Yggdrasil.Authenticate(login, password);
+            YggLogin = login;
+            YggPassword = password;
+
+            var result = await Yggdrasil.Authenticate(YggLogin, YggPassword);
 
             switch (result.Status)
             {
@@ -19,14 +25,14 @@ namespace ProtocolModern.Client
                     AccessToken                 = result.Info.AccessToken;
                     ClientToken                 = result.Info.ClientToken;
                     SelectedProfile             = result.Info.Profile.ID;
-                    Client.ClientUsername       = result.Info.Profile.Name;
+                    Client.Username       = result.Info.Profile.Name;
                     return true;
 
                 default:
                     AccessToken                 = "None";
                     ClientToken                 = "None";
                     SelectedProfile             = "None";
-                    Client.ClientUsername       = "None";
+                    Client.Username       = "None";
                     return false;
             }
         }
@@ -36,9 +42,6 @@ namespace ProtocolModern.Client
         /// </summary>
         public async Task<bool> RefreshSession()
         {
-            if (!UseLogin)
-                return false;
-
             var result = await Yggdrasil.RefreshSession(AccessToken, ClientToken);
 
             switch (result.Status)
@@ -53,28 +56,13 @@ namespace ProtocolModern.Client
             }
         }
 
-        public async Task<bool> VerifySession()
-        {
-            if (!UseLogin)
-                return false;
+        public async Task<bool> VerifySession() => (await Yggdrasil.VerifySession(AccessToken)).Response;
 
-            return (await Yggdrasil.VerifySession(AccessToken)).Response;
-        }
-
-        public async Task<bool> Invalidate()
-        {
-            if (!UseLogin)
-                return false;
-
-            return (await Yggdrasil.Invalidate(AccessToken, ClientToken)).Response;
-        }
+        public async Task<bool> Invalidate() => (await Yggdrasil.Invalidate(AccessToken, ClientToken)).Response;
 
         public override async Task<bool> Logout()
         {
-            if (!UseLogin)
-                return false;
-
-            return (await Yggdrasil.Logout(Client.ClientLogin, Client.ClientPassword)).Response;
+            return (await Yggdrasil.Logout(YggLogin, YggPassword)).Response;
         }
     }
 }

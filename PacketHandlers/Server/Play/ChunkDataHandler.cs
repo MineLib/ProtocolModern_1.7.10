@@ -13,9 +13,9 @@ using ProtocolModern.Packets.Client.Play;
 
 namespace ProtocolModern.PacketHandlers.Server.Play
 {
-    public class ChunkDataHandler : ProtocolPacketHandler<ChunkDataPacket, Packet>
+    public class ChunkDataHandler : ProtocolPacketHandler<ChunkDataPacket>
     {
-        public override Packet Handle(ChunkDataPacket packet)
+        public override ProtobufPacket Handle(ChunkDataPacket packet)
         {
             var metadata = new ChunkColumnMetadata
             {

@@ -1,28 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 
-using Aragas.Core;
 using Aragas.Core.Data;
 using Aragas.Core.IO;
 using Aragas.Core.Packets;
 using Aragas.Core.Wrappers;
 
-using MineLib.Core;
+using MineLib.Core.Client;
+using MineLib.Core.Loader;
 using MineLib.Core.Exceptions;
-using MineLib.Core.Interfaces;
-
-using Org.BouncyCastle.Crypto;
-using Org.BouncyCastle.Security;
 
 using ProtocolModern.Packets;
 using ProtocolModern.Packets.Client.Play;
-using ProtocolModern.Packets.Server.Login;
 
 namespace ProtocolModern.Client
 {
-    public sealed partial class Protocol : MineLib.Core.Protocol
+    public sealed partial class Protocol : MineLib.Core.Client.Protocol
     {
         static Protocol()
         {
@@ -33,9 +27,7 @@ namespace ProtocolModern.Client
 
         public override string Name => "Modern";
         public override string Version => "1.7.10";
-        public override int ProtocolVersion => 5;
-
-        public override IStatusClient CreateStatusClient => new StatusClient();
+        public override int NetworkVersion => 5;
 
         public override string Host => Stream?.Host ?? string.Empty;
         public override ushort Port => Stream?.Port ?? 0;
@@ -64,14 +56,25 @@ namespace ProtocolModern.Client
         private IThread ReadThread { get; set; }
         private CancellationTokenSource CancellationToken { get; } = new CancellationTokenSource();
 
-        private ProtobufStream Stream { get; }
+        internal ProtobufStream Stream { get; }
 
 
-        public Protocol(MineLibClient client, ProtocolMode mode) : base(client, mode)
+        public Protocol(MineLibClient client, ProtocolPurpose purpose) : base(client, purpose)
         {
             Stream = new ProtobufStream(TCPClientWrapper.Create());
 
             RegisterSupportedSendings();
+
+
+
+
+            //ModAPIs
+            var modules = AssemblyParser.GetAssemblyInfos("Forge*.dll");
+            if (modules.Any())
+                foreach (var module in modules)
+                    LoadForgeModAPI(module);
+            else
+                LoadForgeModAPI(new AssemblyInfo("NONE"));
         }
 
 
@@ -105,40 +108,40 @@ namespace ProtocolModern.Client
                 {
                     #region Status
 
-                    case ConnectionState.InfoRequest:
+                    case ClientState.InfoRequest:
                         if (ClientPackets.StatusPacketResponses.Packets[id] == null)
                             throw new ProtocolException("Reading error: Wrong Status packet ID.");
 
                         packet = ClientPackets.StatusPacketResponses.Packets[id]().ReadPacket(reader);
 
-                        OnPacketHandled(id, packet, ConnectionState.InfoRequest);
+                        OnPacketHandled(id, packet, ClientState.InfoRequest);
                         break;
 
                     #endregion Status
 
                     #region Login
 
-                    case ConnectionState.Joining:
+                    case ClientState.Joining:
                         if (ClientPackets.LoginPacketResponses.Packets[id] == null)
                             throw new ProtocolException("Reading error: Wrong Login packet ID.");
 
                         packet = ClientPackets.LoginPacketResponses.Packets[id]().ReadPacket(reader);
 
-                        OnPacketHandled(id, packet, ConnectionState.Joining);
+                        OnPacketHandled(id, packet, ClientState.Joining);
                         break;
 
                     #endregion Login
 
                     #region Play
 
-                    case ConnectionState.Joined:
-                        if (ClientPackets.PlayPacketResponses.Packets[id] == null)
+                    case ClientState.Joined:
+                        if (id < 0 || ClientPackets.PlayPacketResponses.Packets[id] == null)
                             break;
                             //throw new ProtocolException("Reading error: Wrong Play packet ID.");
 
                         packet = ClientPackets.PlayPacketResponses.Packets[id]().ReadPacket(reader);
 
-                        OnPacketHandled(id, packet, ConnectionState.Joined);
+                        OnPacketHandled(id, packet, ClientState.Joined);
                         break;
 
                     #endregion Play
@@ -157,18 +160,24 @@ namespace ProtocolModern.Client
         }
         
 
-        internal void SetState(ConnectionState state) { State = state; }
+        internal void SetState(ClientState state) { State = state; }
 
 
         #region Network
 
-        public override void Connect(string host, ushort port)
+        public override IStatusClient CreateStatusClient() => new StatusClient();
+
+        public override void Connect(ServerInfo serverInfo)
         {
             if (Connected)
                 throw new ProtocolException("Connection error: Already connected to server.");
 
+            foreach (var modAPI in ModAPIs)
+                modAPI.OnConnect(serverInfo);
+            
+
             // -- Connect to server.
-            Stream.Connect(host, port);
+            Stream.Connect(serverInfo.Address.IP, serverInfo.Address.Port);
 
             // -- Begin data reading.
             if (ReadThread != null && ReadThread.IsRunning)
@@ -191,7 +200,8 @@ namespace ProtocolModern.Client
 
             Stream.Disconnect();
         }
-        private void SendPacket(ProtobufPacket packet)
+
+        public void SendPacket(ProtobufPacket packet)
         {
             if (!Connected)
                 throw new ProtocolException("Connection error: Not connected to server.");
@@ -201,34 +211,6 @@ namespace ProtocolModern.Client
 #if DEBUG
             PacketsSended.Add(packet);
 #endif
-        }
-
-        public void ModernEnableEncryption(string serverID, byte[] publicKey, byte[] verifyToken)
-        {
-            var generator = new CipherKeyGenerator();
-            generator.Init(new KeyGenerationParameters(new SecureRandom(), 16 * 8));
-            var sharedKey = generator.GenerateKey();
-
-            var hash = GetServerIDHash(publicKey, sharedKey, serverID);
-            if (!Yggdrasil.JoinSession(AccessToken, SelectedProfile, hash).Result.Response)
-                throw new Exception("Yggdrasil error: Not authenticated.");
-
-            var signer = new PKCS1Signer(publicKey);
-            SendPacket(new EncryptionResponsePacket
-            {
-                SharedSecret = signer.SignData(sharedKey),
-                VerifyToken = signer.SignData(verifyToken)
-            });
-            Stream.InitializeEncryption(sharedKey);
-        }
-        private static string GetServerIDHash(byte[] publicKey, byte[] secretKey, string serverID)
-        {
-            var hashlist = new List<byte>();
-            hashlist.AddRange(Encoding.UTF8.GetBytes(serverID));
-            hashlist.AddRange(secretKey);
-            hashlist.AddRange(publicKey);
-
-            return JavaHelper.JavaHexDigest(hashlist.ToArray());
         }
 
         #endregion

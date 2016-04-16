@@ -4,8 +4,6 @@ using Aragas.Core.Data;
 using Aragas.Core.IO;
 using Aragas.Core.Packets;
 
-using MineLib.Core.Data;
-
 using ProtocolModern.Enum;
 
 namespace ProtocolModern.Packets.Client.Play
@@ -18,8 +16,7 @@ namespace ProtocolModern.Packets.Client.Play
 		public String TeamPrefix;
 		public String TeamSuffix;
 		public SByte FriendlyFire;
-		public Int16 PlayerCount;
-		public NotSupportedType Players;
+		//public NotSupportedType Players;
 
         public override VarInt ID => ClientPlayPacketTypes.Teams;
 
@@ -31,8 +28,8 @@ namespace ProtocolModern.Packets.Client.Play
 			TeamPrefix = reader.Read(TeamPrefix);
 			TeamSuffix = reader.Read(TeamSuffix);
 			FriendlyFire = reader.Read(FriendlyFire);
-			PlayerCount = reader.Read(PlayerCount);
-			Players = reader.Read(Players);
+			var PlayersLength = reader.Read<short>();
+			//Players = reader.Read(Players);
 
             return this;
         }
@@ -45,8 +42,8 @@ namespace ProtocolModern.Packets.Client.Play
 			stream.Write(TeamPrefix);
 			stream.Write(TeamSuffix);
 			stream.Write(FriendlyFire);
-			stream.Write(PlayerCount);
-			stream.Write(Players);
+			//stream.Write((short) Players.Length);
+			//stream.Write(Players);
           
             return this;
         }

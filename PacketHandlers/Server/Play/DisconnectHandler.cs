@@ -6,9 +6,9 @@ using ProtocolModern.Packets.Client.Play;
 
 namespace ProtocolModern.PacketHandlers.Server.Play
 {
-    public class DisconnectHandler : ProtocolPacketHandler<DisconnectPacket, Packet>
+    public class DisconnectHandler : ProtocolPacketHandler<DisconnectPacket>
     {
-        public override Packet Handle(DisconnectPacket packet)
+        public override ProtobufPacket Handle(DisconnectPacket packet)
         {
             Context.ClientReceiveEvent(new DisconnectEvent());
             Context.Disconnect();

@@ -39,7 +39,7 @@ namespace ProtocolModern.Client
                 SendingHandlers[sendingType].Remove(TransformSending(func));
         }
         
-        public override void DoSending<TSendingType>(TSendingType args)
+        public override void FireEvent<TSendingType>(TSendingType args)
         {
             var sendingType = args.GetType();
 
@@ -89,7 +89,7 @@ namespace ProtocolModern.Client
             {
                 ServerAddress = args.ServerHost + "\0FML\0",
                 ServerPort = args.Port,
-                ProtocolVersion = new VarInt(ProtocolVersion),
+                ProtocolVersion = new VarInt(NetworkVersion),
                 NextState = NextState.Login
             });
 
@@ -127,7 +127,7 @@ namespace ProtocolModern.Client
             args.SendPacket(new PluginMessagePacket
             {
                 Channel = "MC|Brand",
-                Data = Encoding.UTF8.GetBytes(Client.ClientBrand)
+                Data = Encoding.UTF8.GetBytes(Client.Name)
             });
         }
 

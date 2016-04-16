@@ -6,9 +6,9 @@ using ProtocolModern.Packets.Client.Play;
 
 namespace ProtocolModern.PacketHandlers.Server.Play
 {
-    public class JoinGameHandler : ProtocolPacketHandler<JoinGamePacket, Packet>
+    public class JoinGameHandler : ProtocolPacketHandler<JoinGamePacket>
     {
-        public override Packet Handle(JoinGamePacket packet)
+        public override ProtobufPacket Handle(JoinGamePacket packet)
         {
             Context.ClientReceiveEvent(new PlayerIDEvent(packet.EntityID));
             Context.ClientReceiveEvent(new GameInfoEvent(packet.GameMode, packet.Difficulty, (byte) packet.Dimension));

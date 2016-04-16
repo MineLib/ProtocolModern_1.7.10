@@ -1,20 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
-
-using ProtocolModern.Packets.Client.Play;
 
 namespace ProtocolModern.Client
 {
     public sealed partial class Protocol
     {
-        private List<string> RegisteredServerPluginChannels { get; } = new List<String>();
-
-
-        public void OnPluginMessagePacket(PluginMessagePacket packet)
-        {
-            OnPluginChannelMessage(packet.Channel, packet.Data);
-        }
+        private List<string> RegisteredServerPluginChannels { get; } = new List<string>();
 
 
         public void OnPluginChannelMessage(string channel, byte[] data)
@@ -32,8 +23,14 @@ namespace ProtocolModern.Client
                 foreach (var chan in channels)
                     RegisteredServerPluginChannels.Remove(chan);
             }
+            else if (channel.StartsWith("MC|"))
+            {
+
+            }
             else
-                OnPluginChannelMessageForge(channel, data);
+            {
+                
+            }
         }
     }
 }

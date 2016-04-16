@@ -18,17 +18,18 @@ namespace ProtocolModern.Packets.Client.Play
 
         public override ProtobufPacket ReadPacket(ProtobufDataReader reader)
         {
-			EntityID = reader.Read(EntityID);
-            var PropertiesLength = reader.Read<Int32>();
-            Properties = reader.Read(Properties, PropertiesLength);
+			//EntityID = reader.Read(EntityID);
+            //var PropertiesLength = reader.Read<Int32>();
+            //Properties = reader.Read(Properties, PropertiesLength);
 
             return this;
         }
 
         public override ProtobufPacket WritePacket(ProtobufStream stream)
         {
-			stream.Write(EntityID);
-			stream.Write(Properties);
+            stream.Write(EntityID);
+            stream.Write(Properties.Length);
+            stream.Write(Properties, false);
           
             return this;
         }

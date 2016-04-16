@@ -6,9 +6,9 @@ using ProtocolModern.Packets.Client.Play;
 
 namespace ProtocolModern.PacketHandlers.Server.Play
 {
-    public class RespawnHandler : ProtocolPacketHandler<RespawnPacket, Packet>
+    public class RespawnHandler : ProtocolPacketHandler<RespawnPacket>
     {
-        public override Packet Handle(RespawnPacket packet)
+        public override ProtobufPacket Handle(RespawnPacket packet)
         {
             Context.ClientReceiveEvent(new GameInfoEvent(packet.GameMode, packet.Difficulty, (byte) packet.Dimension));
 

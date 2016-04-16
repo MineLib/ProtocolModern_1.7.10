@@ -1,4 +1,6 @@
-﻿using Aragas.Core.Extensions;
+﻿using System;
+
+using Aragas.Core.Extensions;
 using Aragas.Core.PacketHandlers;
 using Aragas.Core.Packets;
 using Aragas.Core.Wrappers;
@@ -7,11 +9,11 @@ using ProtocolModern.Enum;
 
 namespace ProtocolModern.PacketHandlers
 {
-    public static class ServerPacketHandlers
+    internal static class ServerPacketHandlers
     {
-        public static class LoginPacketResponses
+        internal static class LoginPacketResponses
         {
-            public static readonly ContextFunc<ProtobufPacket>[] Handlers;
+            internal static readonly Func<IPacketHandlerContext, ContextFunc<ProtobufPacket>>[] Handlers;
 
             static LoginPacketResponses()
             {
@@ -19,9 +21,9 @@ namespace ProtocolModern.PacketHandlers
             }
         }
 
-        public static class PlayPacketResponses
+        internal static class PlayPacketResponses
         {
-            public static readonly ContextFunc<ProtobufPacket>[] Handlers;
+            internal static readonly Func<IPacketHandlerContext, ContextFunc<ProtobufPacket>>[] Handlers;
 
             static PlayPacketResponses()
             {
@@ -29,9 +31,9 @@ namespace ProtocolModern.PacketHandlers
             }
         }
 
-        public static class StatusPacketResponses
+        internal static class StatusPacketResponses
         {
-            public static readonly ContextFunc<ProtobufPacket>[] Handlers;
+            internal static readonly Func<IPacketHandlerContext, ContextFunc<ProtobufPacket>>[] Handlers;
 
             static StatusPacketResponses()
             {
