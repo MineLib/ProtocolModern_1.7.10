@@ -8,5 +8,5 @@ install:
 before_build:
 - nuget restore
 build:
-  project: ProtocolModern.sln
+  project: ProtocolModern_1.7.10.sln
   verbosity: minimal
