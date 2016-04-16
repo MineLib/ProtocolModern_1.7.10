@@ -2,17 +2,17 @@ language: csharp
 mono:
   - latest
 
-solution: ProtocolModern.sln
+solution: ProtocolModern_1.7.10.sln
 
 before_install:
   - git submodule update --init --recursive
   
 install:
-  - nuget restore ProtocolModern.sln
+  - nuget restore ProtocolModern_1.7.10.sln
 
 script:
-  - xbuild /p:Configuration=Release ProtocolModern.sln
-  - xbuild /p:Configuration=Debug ProtocolModern.sln
+  - xbuild /p:Configuration=Release ProtocolModern_1.7.10.sln
+  - xbuild /p:Configuration=Debug ProtocolModern_1.7.10.sln
 
 notifications:
   email:
